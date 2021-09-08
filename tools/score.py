@@ -15,26 +15,26 @@ def clean(label):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-f', type=str, default='../misc/preds/temp.txt', help='path to preds file')
-parser.add_argument('-m', type=str, default='word', help='path to preds file')
-parser.add_argument('-l', action='store_true', help='convert strings to lowercase ebfore comparison')
+parser.add_argument('--preds', type=str, default='../misc/preds/temp.txt', help='path to preds file')
+parser.add_argument('--mode', type=str, default='word', help='path to preds file')
+parser.add_argument('--lower', action='store_true', help='convert strings to lowercase ebfore comparison')
 parser.add_argument('--alnum', action='store_true', help='convert strings to alphanumeric before comparison')
 opt = parser.parse_args()
 
-f = open(opt.f, 'r')
+f = open(opt.preds, 'r')
 
 tw = 0
 ww = 0
 tc = 0
 wc = 0
 
-if opt.m == 'word':
+if opt.mode == 'word':
 	for i , line in enumerate(f):
 		if i%2==0:
 			pred = line.strip()
 		else:
 			gt = line.strip()
-			if opt.l:
+			if opt.lower:
 				gt = gt.lower()
 				pred = pred.lower()
 			if opt.alnum:

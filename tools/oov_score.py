@@ -15,21 +15,20 @@ def clean(label):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-f', type=str, default='../misc/preds/temp.txt', help='path to preds file')
-parser.add_argument('-m', type=str, default='word', help='path to preds file')
-parser.add_argument('-l', action='store_true', help='convert strings to lowercase ebfore comparison')
+parser.add_argument('--preds', type=str, default='../misc/preds/temp.txt', help='path to preds file')
+parser.add_argument('--vocab', type=str, required=True)
+parser.add_argument('--mode', type=str, default='word', help='path to preds file')
+parser.add_argument('--lower', action='store_true', help='convert strings to lowercase ebfore comparison')
 parser.add_argument('--alnum', action='store_true', help='convert strings to alphanumeric before comparison')
-parser.add_argument('--lang', type=str, required=True)
 opt = parser.parse_args()
 
 train_vocab = []
-#with open(f'/ssd_scratch/cvit/santhoshini/train_{opt.lang}.txt') as f:
-with open(f'/ssd_scratch/cvit/santhoshini/train_vocab.txt') as f:
+with open(opt.vocab) as f:
     for line in f:
         train_vocab.append(line.strip())
 
 
-f = open(opt.f, 'r')
+f = open(opt.preds, 'r')
 
 tw = 0
 ww = 0
@@ -37,7 +36,7 @@ tc = 0
 wc = 0
 
 word_lens = []
-if opt.m == 'word':
+if opt.mode == 'word':
     for i , line in enumerate(f):
         print(line)
         if i%2==0:
@@ -46,7 +45,7 @@ if opt.m == 'word':
             gt = line.strip()
             if gt in train_vocab:
                 continue
-            if opt.l:
+            if opt.lower:
                 gt = gt.lower()
                 pred = pred.lower()
             if opt.alnum:
