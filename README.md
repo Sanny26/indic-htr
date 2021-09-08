@@ -3,7 +3,7 @@ Handwriting recognition for various Indic scripts using deep learning(STN, CNN, 
 
 For more info about the pipeline, please refer to *IIIT-INDIC-HW-WORDS: A Dataset for Indic Handwritten Text Recognition*
 
-[Project Page & Dataset](http://cvit.iiit.ac.in/research/projects/cvit-projects/iiit-indic-hw-words) | [Teaser](http://cvit.iiit.ac.in/images/Projects/iiit-indic-hw-words/331.mp4)
+[\[Paper\]](http://cvit.iiit.ac.in/images/ConferencePapers/2021/iiit-indic-hw-words.pdf)| [\[Dataset\]](http://cvit.iiit.ac.in/research/projects/cvit-projects/iiit-indic-hw-words) | [\[Teaser\]](http://cvit.iiit.ac.in/images/Projects/iiit-indic-hw-words/331.mp4)
 
 ## Training and Evaluation:
 
