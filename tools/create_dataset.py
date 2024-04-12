@@ -13,7 +13,7 @@ import argparse
 def checkImageIsValid(imageBin):
     if imageBin is None:
         return False
-    imageBuf = np.fromstring(imageBin, dtype=np.uint8)
+    imageBuf = np.frombuffer(imageBin, dtype=np.uint8)
     img = cv2.imdecode(imageBuf, cv2.IMREAD_GRAYSCALE)
     imgH, imgW = img.shape[0], img.shape[1]
     if imgH * imgW == 0:
@@ -67,7 +67,6 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
         cache[imageKey] = imageBin
         cache[labelKey] = label
         cache[fileKey] = imagePath
-        # pdb.set_trace()
         if lexiconList:
             lexiconKey = 'lexicon-%09d' % cnt
             cache[lexiconKey] = ' '.join(lexiconList[i])
@@ -96,22 +95,25 @@ def valid_label(label):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--root_dir', type=str, required=True, help='dir path for IIIT-INDIC data')
-    parser.add_argument('--save', type=str, required=True, help='destination file name and path')
+    parser.add_argument('--folder', type=str, required=True, choices=['train', 'val', 'test'])
+    parser.add_argument('--save_as', type=str, required=True, help='destination file name and path')
     opt = parser.parse_args()
 
-    splits = ['test', 'val', 'train']
-    alphabet = set()
-    for split in splits:
-        img_list = []
-        label_list = []
-        with open(f'{opt.root_dir}/{split}.txt') as f:
-            for line in f:
-                path, label = line.strip().split(',')
-                img_list.append(f'{opt.root_dir}'+path.strip())
-                label_list.append(label.strip())
-                alphabet = alphabet.union(list(label.strip()))
-        outputPath = opt.save
-        createDataset(outputPath, img_list, label_list, checkValid=True)
+    img_dir = f'{opt.root_dir}/'
+    ann_file = f'{opt.root_dir}/{opt.folder}.txt'
+    vocab_file = f'{opt.root_dir}/vocab.txt'
+    f = open(vocab_file)
+    vocab_list = [line.strip() for line in f.readlines()]
+
+    img_list = []
+    label_list = []
+    with open(ann_file) as f:
+        for line in f:
+            path, label = line.strip().split(',')
+            img_list.append(f'{img_dir}/'+path.strip())
+            label_list.append(vocab_list[int(label.strip())])
+    
+    createDataset(opt.save_as, img_list, label_list, checkValid=True)
 
     # alphabet = sorted(alphabet)
     # with open(f"/media/data1/qrmary/iiit-indic-hw-words/bn_final3/files/char.txt", 'w') as f:

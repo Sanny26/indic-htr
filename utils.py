@@ -41,7 +41,7 @@ class strLabelConverter(object):
                     entext.append(self.char2id[self.ctc_blank])
                 entext.append(self.char2id[char])
             length = [len(entext)]
-        elif isinstance(text, collections.Iterable):
+        elif isinstance(text, collections.abc.Iterable):
             entext = []
             length = []
             for s in text:

@@ -84,9 +84,11 @@ class lmdbDataset(data.Dataset):
         out_of_char = f'[^{"".join(self.voc)}]'
         to_remove = re.search(out_of_char, word)
         if to_remove:
+           print(f'Accented characters need to removed! -- |{word}|')
            pattern = re.compile(out_of_char)
            word = pattern.sub('', word)
            print(out_of_char, word, to_remove)
+
         if self.return_list:
             return [img, word, img.size(2)]
         return img, word, img.size(2)

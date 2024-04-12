@@ -23,22 +23,12 @@ lang = f'{opt.lang}'
 dataset_name = f'{opt.lang}'
 opt.alphabet_type = "file"
 opt.alphabet = f"{opt.lang}.txt"
-opt.trainRoot = f'/ssd_scratch/cvit/santhoshini/{opt.lang}-val-lmdb'
-
-if opt.mode == 'test':
-    opt.valRoot = f'/ssd_scratch/cvit/santhoshini/{opt.lang}-test-lmdb'
-    print(f'Testing on {opt.valRoot}')
-else:
-	opt.valRoot = f'/ssd_scratch/cvit/santhoshini/{opt.lang}-val-lmdb'
 
 opt.valInterval = 1000
 opt.displayInterval = 100
-opt.nepoch = 1
-opt.cuda = True
 opt.random_sample = True
 opt.workers = 10
 opt.batchSize = 64
-opt.ngpu = 1
 
 
 opt.adadelta = True

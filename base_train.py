@@ -48,7 +48,7 @@ def weights_init(m):
 
 def check_data(data_loader, name='sample'):
         data_iter = iter(data_loader)
-        data = data_iter.next()
+        data = next(data_iter)
         cpu_images = data[0]
         cpu_texts = data[1]
         nim = min(16, cpu_images.size(0))
@@ -88,8 +88,7 @@ class BaseHTR(object):
         self.use_loc_bn = False
         self.CNN = 'ResCRNN'
         self.loc_block = 'LocNet'
-        self.identity_matrix = torch.tensor([1, 0, 0, 0, 1, 0],
-                                       dtype=torch.float).cuda()
+        # self.identity_matrix = torch.tensor([1, 0, 0, 0, 1, 0], dtype=torch.float).cuda()
         if self.mode == 'train':
             if len(self.opt.trainRoot) == 0:
                 self.train_root = "/ssd_scratch/cvit/santhoshini/{}-train-lmdb".format(self.dataset_name)
@@ -116,12 +115,14 @@ class BaseHTR(object):
         cudnn.enabled = True
         # print('CudNN enabled', cudnn.enabled)
 
+        self.device = torch.device('cpu')
         if torch.cuda.is_available() and not self.opt.cuda:
             print("WARNING: You have a CUDA device, so you should probably run with --cuda")
-        else:
+        if self.opt.cuda:
+            self.device = torch.device('cuda')
             self.opt.gpu_id = list(map(int, self.opt.gpu_id.split(',')))
             torch.cuda.set_device(self.opt.gpu_id[0])
-
+        
 
     def run(self):
         if self.mode == "train":
@@ -230,8 +231,9 @@ class BaseHTR(object):
                 crnn.load_state_dict(d_params)
             else:
                 print('Using pretrained model', self.opt.pretrained)
-                crnn.load_state_dict(torch.load(self.opt.pretrained))
+                crnn.load_state_dict(torch.load(self.opt.pretrained, map_location=self.device))
         else:
+            print('Using random weight intialization')
             crnn.apply(weights_init)
         return crnn, crnn.parameters()
 
@@ -350,16 +352,19 @@ class BaseHTR(object):
             for i in range(max_iter):
                 if self.opt.mode == 'test':
                     print('%d / %d' % (i, len(data_loader)), end='\r')
-                output_dict = self.forward_sample(val_iter.next())
+                output_dict = self.forward_sample(next(val_iter))
                 batch_size = output_dict['batch_size']
                 preds = F.log_softmax(output_dict['probs'], 2)
                 preds_size = Variable(torch.IntTensor([preds.size(0)] * batch_size))
-                cost = self.get_loss({'preds': preds, 'batch_size': batch_size,
-                                      'preds_size': preds_size, 'params':output_dict['params']})
-                loss_avg.add(cost)
+                # print(preds)    
                 decoded_pred = self.decoder(preds, preds_size)
                 gts += list(output_dict['gt'])
                 decoded_preds += list(decoded_pred)
+                # print("Format:Pred|GT", '1{}1\n2{}\n2'.format(decoded_preds[-1], output_dict['gt']))
+                if self.mode == "train":
+                    cost = self.get_loss({'preds': preds, 'batch_size': batch_size,
+                                      'preds_size': preds_size, 'params':output_dict['params']})
+                    loss_avg.add(cost)
 
         if self.mode == "train":
             pcounter = 0
@@ -380,13 +385,14 @@ class BaseHTR(object):
             f = open(self.opt.out, 'w')
             for target, pred in zip(gts, decoded_preds):
                 f.write('{}\n{}\n'.format(pred, target))
+                print("Format:Pred|GT", '{}\n{}\n'.format(pred, target))
             f.close()
             print('Generated predictions for {} samples'.format(self.test_data.nSamples))
         return
 
     def trainBatch(self):
         self.model.train()
-        output_dict = self.forward_sample(self.train_iter.next())
+        output_dict = self.forward_sample(next(self.train_iter))
         batch_size = output_dict['batch_size']
         preds = F.log_softmax(output_dict['probs'], 2)
         preds_size = Variable(torch.LongTensor([preds.size(0)] * batch_size))

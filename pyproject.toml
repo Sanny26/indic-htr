@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "indic-htr"
+version = "0.1.0"
+description = "Maintaining requirements for the repo."
+authors = ["Santhoshini Gongidi"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+lmdb = "^1.4.1"
+opencv-python = "^4.9.0.80"
+pillow = "^10.3.0"
+torch = {version = "^2.2.2+cpu", source = "pytorch_cpu"}
+torchvision = {version = "^0.17.2+cpu", source = "pytorch_cpu"}
+matplotlib = "^3.8.4"
+scikit-image = "^0.23.1"
+colorama = "^0.4.6"
+tensorboard = "^2.16.2"
+
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
